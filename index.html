@@ -1,56 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Learning D3</title>
-    <link rel="stylesheet" href="main.css">
-    <script src="d3.min.js"></script>
-  </head>
-  <body>
-    <script>
+
+<head>
+  <title>Learning D3</title>
+  <link rel="stylesheet" href="main.css">
+  <script src="d3.min.js"></script>
+</head>
+
+<body>
+  <script>
     var w = 800;
     var h = 450;
-    var data = [132,71,337,93,78,43,20,16,30,8,17,21];
+    var margin = {
+      top: 20,
+      left: 20,
+      right: 20,
+      bottom: 20
+    };
+    var width = w - margin.left - margin.right;
+    var height = h - margin.top - margin.bottom;
+    var data = [132, 71, 337, 93, 78, 43, 20, 16, 30, 8, 17, 21];
     var x = d3.scaleLinear()
-              .domain([0, d3.max(data)])
-              .range([0, w]);
+      .domain([0, d3.max(data)])
+      .range([0, width]);
     var y = d3.scaleLinear()
-              .domain([0, data.length])
-              .range([0, h]);
+      .domain([0, data.length])
+      .range([0, height]);
     var svg = d3.select("body").append("svg")
-                .attr("id", "chart")
-                .attr("width", w)
-                .attr("height", h);
-    svg.selectAll(".bar")
-       .data(data)
-       .enter()
-          .append("rect")
-          .classed("bar", true)
-          .attr("x", 0)
-          .attr("y", function(datum, idx){
-            return y(idx);
-          })
-          .attr("width", function(datum, idx){
-            return x(datum);
-          })
-          .attr("height", y(1)-1);
-    svg.selectAll(".bar-label")
-       .data(data)
-       .enter()
-          .append("text")
-          .classed("bar-label", true)
-          .attr("x", function( datum, idx) {
-            return x(datum);
-          })
-          .attr("dx", -4)
-          .attr("y", function(datum, idx){
-            return y(idx);
-          })
-          .attr("dy", function(datum, idx) {
-            return y(1)/1.5+2;
-          })
-          .text(function(datum, idx) {
-            return datum;
-          });
-        </script>
-  </body>
+      .attr("id", "chart")
+      .attr("width", w)
+      .attr("height", h);
+    var barChart = svg.append("g")
+                      .classed("display", true)
+                      .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+    function plot(params) {
+      this.selectAll(".bar")
+        .data(params.data)
+        .enter()
+        .append("rect")
+        .classed("bar", true)
+        .attr("x", 0)
+        .attr("y", function (datum, idx) {
+          return y(idx);
+        })
+        .attr("width", function (datum, idx) {
+          return x(datum);
+        })
+        .attr("height", y(1) - 1);
+      this.selectAll(".bar-label")
+        .data(params.data)
+        .enter()
+        .append("text")
+        .classed("bar-label", true)
+        .attr("x", function (datum, idx) {
+          return x(datum);
+        })
+        .attr("dx", -4)
+        .attr("y", function (datum, idx) {
+          return y(idx);
+        })
+        .attr("dy", function (datum, idx) {
+          return y(1) / 1.5 + 2;
+        })
+        .text(function (datum, idx) {
+          return datum;
+        });
+    }
+
+    plot.call(
+      barChart,
+      {
+        data: data
+      }
+    );
+  </script>
+</body>
+
 </html>

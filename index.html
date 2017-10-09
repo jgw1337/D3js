@@ -10,6 +10,12 @@
     var w = 800;
     var h = 450;
     var data = [132,71,337,93,78,43,20,16,30,8,17,21];
+    var x = d3.scaleLinear()
+              .domain([0, d3.max(data)])
+              .range([0, w]);
+    var y = d3.scaleLinear()
+              .domain([0, data.length])
+              .range([0, h]);
     var svg = d3.select("body").append("svg")
                 .attr("id", "chart")
                 .attr("width", w)
@@ -21,12 +27,12 @@
           .attr("class", "bar")
           .attr("x", 0)
           .attr("y", function(datum, idx){
-            return idx * 20;
+            return y(idx);
           })
           .attr("width", function(datum, idx){
-            return datum;
+            return x(datum);
           })
-          .attr("height", 19)
+          .attr("height", y(1)-1)
         </script>
   </body>
 </html>

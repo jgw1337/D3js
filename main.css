@@ -12,3 +12,8 @@ body, html {
 .bar {
 	fill: purple;
 }
+.bar-label {
+	fill: white;
+	text-anchor: end;
+	font-size: 24px;
+}

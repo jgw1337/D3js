@@ -32,7 +32,25 @@
           .attr("width", function(datum, idx){
             return x(datum);
           })
-          .attr("height", y(1)-1)
+          .attr("height", y(1)-1);
+    svg.selectAll(".bar-label")
+       .data(data)
+       .enter()
+          .append("text")
+          .classed("bar-label", true)
+          .attr("x", function( datum, idx) {
+            return x(datum);
+          })
+          .attr("dx", -4)
+          .attr("y", function(datum, idx){
+            return y(idx);
+          })
+          .attr("dy", function(datum, idx) {
+            return y(1)/1.5+2;
+          })
+          .text(function(datum, idx) {
+            return datum;
+          });
         </script>
   </body>
 </html>

@@ -38,8 +38,10 @@
         return datum.value;
       })])
       .range([0, width]);
-    var y = d3.scaleLinear()
-      .domain([0, data.length])
+    var y = d3.scaleBand()
+      .domain(data.map(function(item) {
+        return item.key;
+      }))
       .range([0, height]);
     var svg = d3.select("body").append("svg")
       .attr("id", "chart")
@@ -57,12 +59,12 @@
         .classed("bar", true)
         .attr("x", 0)
         .attr("y", function (datum, idx) {
-          return y(idx);
+          return y(datum.key);
         })
         .attr("width", function (datum, idx) {
           return x(datum.value);
         })
-        .attr("height", y(1) - 1);
+        .attr("height", y.bandwidth() - 1);
       this.selectAll(".bar-label")
         .data(params.data)
         .enter()
@@ -73,10 +75,10 @@
         })
         .attr("dx", -4)
         .attr("y", function (datum, idx) {
-          return y(idx);
+          return y(datum.key);
         })
         .attr("dy", function (datum, idx) {
-          return y(1) / 1.5 + 2;
+          return y.bandwidth() / 1.5 + 2;
         })
         .text(function (datum, idx) {
           return datum.value;

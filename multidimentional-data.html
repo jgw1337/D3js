@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Learning D3</title>
+  <link rel="stylesheet" href="main.css">
+  <script src="d3.min.js"></script>
+</head>
+
+<body>
+  <script>
+    var data = [
+      { key: "Glazed",    value: "132" },
+      { key: "Jelly",     value: "71" },
+      { key: "Holes",     value: "337" },
+      { key: "Sprinkles", value: "93" },
+      { key: "Crumb",     value: "78" },
+      { key: "Chocolate", value: "43" },
+      { key: "Coconut",   value: "20" },
+      { key: "Cream",     value: "16" },
+      { key: "Cruller",   value: "30" },
+      { key: "Éclair",    value: "8" },
+      { key: "Fritter",   value: "17" },
+      { key: "Bearclaw",  value: "21" }
+    ];
+    var w = 800;
+    var h = 450;
+    var margin = {
+      top: 20,
+      left: 20,
+      right: 20,
+      bottom: 20
+    };
+    var width = w - margin.left - margin.right;
+    var height = h - margin.top - margin.bottom;
+    var x = d3.scaleLinear()
+      .domain([0, d3.max(data, function(datum) {
+        return datum.value;
+      })])
+      .range([0, width]);
+    var y = d3.scaleLinear()
+      .domain([0, data.length])
+      .range([0, height]);
+    var svg = d3.select("body").append("svg")
+      .attr("id", "chart")
+      .attr("width", w)
+      .attr("height", h);
+    var barChart = svg.append("g")
+                      .classed("display", true)
+                      .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+    function plot(params) {
+      this.selectAll(".bar")
+        .data(params.data)
+        .enter()
+        .append("rect")
+        .classed("bar", true)
+        .attr("x", 0)
+        .attr("y", function (datum, idx) {
+          return y(idx);
+        })
+        .attr("width", function (datum, idx) {
+          return x(datum.value);
+        })
+        .attr("height", y(1) - 1);
+      this.selectAll(".bar-label")
+        .data(params.data)
+        .enter()
+        .append("text")
+        .classed("bar-label", true)
+        .attr("x", function (datum, idx) {
+          return x(datum.value);
+        })
+        .attr("dx", -4)
+        .attr("y", function (datum, idx) {
+          return y(idx);
+        })
+        .attr("dy", function (datum, idx) {
+          return y(1) / 1.5 + 2;
+        })
+        .text(function (datum, idx) {
+          return datum.value;
+        });
+    }
+
+    plot.call(
+      barChart,
+      {
+        data: data
+      }
+    );
+  </script>
+</body>
+
+</html>

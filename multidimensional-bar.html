@@ -35,6 +35,7 @@
     var height = h - margin.top - margin.bottom;
     var x = d3.scaleLinear()
       .domain([0, d3.max(data, function(datum) {
+        console.log(width, datum.value);
         return datum.value;
       })])
       .range([0, width]);
@@ -75,7 +76,9 @@
           console.log(datum.value, x(datum.value));
           return x(datum.value);
         })
-        .attr("height", y.bandwidth() - 1)
+        .attr("height", function(datum, idx) {
+          return y.bandwidth() - 1;
+        })
         .style("fill", function(datum, idx) {
           return ordinalColorScale(idx);
           // return linearColorScale(idx);

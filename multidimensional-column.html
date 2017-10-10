@@ -26,23 +26,23 @@
     var w = 800;
     var h = 450;
     var margin = {
-      top: 20,
-      left: 80,
-      right: 20,
+      top: 40,
+      left: 60,
+      right: 40,
       bottom: 40
     };
     var width = w - margin.left - margin.right;
     var height = h - margin.top - margin.bottom;
-    var x = d3.scaleLinear()
+    var x = d3.scaleBand()
+    .domain(data.map(function(item) {
+      return item.key;
+    }))
+    .range([0, width]);
+    var y = d3.scaleLinear()
       .domain([0, d3.max(data, function(datum) {
         return datum.value;
       })])
-      .range([0, width]);
-    var y = d3.scaleBand()
-      .domain(data.map(function(item) {
-        return item.key;
-      }))
-      .range([0, height]);
+      .range([height, 0]);
 
     var linearColorScale = d3.scaleLinear()
                              .domain([1, data.length])
@@ -67,34 +67,35 @@
         .enter()
         .append("rect")
         .classed("bar", true)
-        .attr("x", 0)
+        .attr("x", function(datum, idx) {
+          return x(datum.key);
+        })
         .attr("y", function (datum, idx) {
-          return y(datum.key);
+          return y(datum.value);
         })
         .attr("width", function (datum, idx) {
           console.log(datum.value, x(datum.value));
-          return x(datum.value);
+          return x.bandwidth();
         })
-        .attr("height", y.bandwidth() - 1)
+        .attr("height", function(datum, idx) {
+          return height - y(datum.value);
+        })
         .style("fill", function(datum, idx) {
           return ordinalColorScale(idx);
           // return linearColorScale(idx);
         });
-      this.selectAll(".bar-label")
+      this.selectAll(".col-label")
         .data(params.data)
         .enter()
         .append("text")
-        .classed("bar-label", true)
+        .classed("col-label", true)
         .attr("x", function (datum, idx) {
-          return x(datum.value);
+          return x(datum.key) + (x.bandwidth()/2);
         })
-        .attr("dx", -4)
         .attr("y", function (datum, idx) {
-          return y(datum.key);
+          return y(datum.value);
         })
-        .attr("dy", function (datum, idx) {
-          return y.bandwidth() / 1.5 + 2;
-        })
+        .attr("dy", -6)
         .text(function (datum, idx) {
           return datum.value;
         });

@@ -21,3 +21,8 @@ body, html {
 	text-anchor: middle;
 	font-size: 24px;
 }
+.gridline {
+	fill: none;
+	stroke: #CCC;
+	shape-rendering: crispEdges;
+}

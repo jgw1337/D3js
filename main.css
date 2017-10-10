@@ -26,3 +26,6 @@ body, html {
 	stroke: #CCC;
 	shape-rendering: crispEdges;
 }
+.axis-label {
+	fill: black;
+}

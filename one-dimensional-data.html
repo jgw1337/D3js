@@ -9,6 +9,7 @@
 
 <body>
   <script>
+    var data = [132, 71, 337, 93, 78, 43, 20, 16, 30, 8, 17, 21];
     var w = 800;
     var h = 450;
     var margin = {
@@ -19,7 +20,6 @@
     };
     var width = w - margin.left - margin.right;
     var height = h - margin.top - margin.bottom;
-    var data = [132, 71, 337, 93, 78, 43, 20, 16, 30, 8, 17, 21];
     var x = d3.scaleLinear()
       .domain([0, d3.max(data)])
       .range([0, width]);

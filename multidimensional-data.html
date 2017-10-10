@@ -43,6 +43,10 @@
         return item.key;
       }))
       .range([0, height]);
+    var linearColorScale = d3.scaleLinear()
+                             .domain([1, data.length])
+                             .range(["#572500", "#F68026"]);
+    var ordinalColorScale = d3.scaleOrdinal(d3.schemeCategory20);
     var svg = d3.select("body").append("svg")
       .attr("id", "chart")
       .attr("width", w)
@@ -62,9 +66,14 @@
           return y(datum.key);
         })
         .attr("width", function (datum, idx) {
+          console.log(datum.value, x(datum.value));
           return x(datum.value);
         })
-        .attr("height", y.bandwidth() - 1);
+        .attr("height", y.bandwidth() - 1)
+        .style("fill", function(datum, idx) {
+          return ordinalColorScale(idx);
+          // return linearColorScale(idx);
+        });
       this.selectAll(".bar-label")
         .data(params.data)
         .enter()

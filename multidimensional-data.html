@@ -27,9 +27,9 @@
     var h = 450;
     var margin = {
       top: 20,
-      left: 20,
+      left: 80,
       right: 20,
-      bottom: 20
+      bottom: 40
     };
     var width = w - margin.left - margin.right;
     var height = h - margin.top - margin.bottom;
@@ -43,10 +43,16 @@
         return item.key;
       }))
       .range([0, height]);
+
     var linearColorScale = d3.scaleLinear()
                              .domain([1, data.length])
                              .range(["#572500", "#F68026"]);
     var ordinalColorScale = d3.scaleOrdinal(d3.schemeCategory20);
+    var xAxis = d3.axisBottom()
+                  .scale(x);
+    var yAxis = d3.axisLeft()
+                  .scale(y);
+
     var svg = d3.select("body").append("svg")
       .attr("id", "chart")
       .attr("width", w)
@@ -92,6 +98,14 @@
         .text(function (datum, idx) {
           return datum.value;
         });
+      this.append("g")
+          .classed("x axis", true)
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+      this.append("g")
+          .classed("y axis", true)
+          .attr("transform", "translate(0,0)")
+          .call(yAxis);
     }
 
     plot.call(

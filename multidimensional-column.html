@@ -71,7 +71,69 @@
                      .attr("id", "controls");
     var sortBtn = controls.append("button")
                           .html("Sort data: ascending")
-                          .attr("state", 0)
+                          .attr("state", 0);
+
+    function drawAxes(params) {
+      if (params.initialize === true) {
+        // Draw gridlines and axes
+
+        // Draw gridlines
+        this.append("g")
+            .call(params.gridlines)
+            .classed("gridline", true)
+            .attr("transform", "translate(0,0)");
+
+        // X-axis
+        this.append("g")
+            .classed("x axis", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(params.axis.x)
+                .selectAll("text")
+                    .classed("x-axis-label", true)
+                    .style("text-anchor", "end")
+                    .attr("dx", -8)
+                    .attr("dy", 8)
+                    .attr("transform", "translate(0,0) rotate(-45)");
+
+        // Y-axis
+        this.append("g")
+            .classed("y axis", true)
+            .attr("transform", "translate(0,0)")
+            .call(params.axis.y);
+
+        // X label
+        this.select(".x.axis")
+            .append("text")
+            .classed("axis-label", true)
+            .attr("x", 0)
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + width/2 + ",80)")
+            .text("Donut type");
+
+        // Y label
+        this.select(".y.axis")
+            .append("text")
+            .classed("axis-label", true)
+            .attr("x", 0)
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(-50," + height/2 + ") rotate(-90)")
+            .text("Units sold");
+      } else if (params.initialize === false) {
+        // Update info
+        this.select("g.x.axis")
+            .call(params.axis.x);
+        this.selectAll(".x-axis-label")
+            .style("text-anchor", "end")
+            .attr("dx", -8)
+            .attr("dy", 8)
+            .attr("transform", "translate(0,0) rotate(-45)");
+        this.select("g.y.axis")
+            .call(params.axis.y);
+      }
+
+    }
 
     function plot(params) {
       x.domain(data.map(function(item) {
@@ -81,11 +143,8 @@
                 return datum.value;
               })]);
 
-      this.append("g")
-          .call(params.gridlines)
-          .classed("gridline", true)
-          .attr("transform", "translate(0,0)");
-      
+      // Draw axes and axes labels
+      drawAxes.call(this, params);      
 
       //enter() phase
       this.selectAll(".bar")
@@ -143,39 +202,6 @@
           .data(params.data)
           .exit()
           .remove();
-
-      this.append("g")
-          .classed("x axis", true)
-          .attr("transform", "translate(0," + height + ")")
-          .call(params.axis.x)
-              .selectAll("text")
-                  .style("text-anchor", "end")
-                  .attr("dx", -8)
-                  .attr("dy", 8)
-                  .attr("transform", "translate(0,0) rotate(-45)");
-
-      this.append("g")
-          .classed("y axis", true)
-          .attr("transform", "translate(0,0)")
-          .call(params.axis.y);
-
-      this.select(".y.axis")
-          .append("text")
-          .classed("axis-label", true)
-          .attr("x", 0)
-          .attr("y", 0)
-          .style("text-anchor", "middle")
-          .attr("transform", "translate(-50," + height/2 + ") rotate(-90)")
-          .text("Units sold");
-      
-      this.select(".x.axis")
-          .append("text")
-          .classed("axis-label", true)
-          .attr("x", 0)
-          .attr("y", 0)
-          .style("text-anchor", "middle")
-          .attr("transform", "translate(" + width/2 + ",80)")
-          .text("Donut type")
     }
 
     sortBtn.on("click", function() {
@@ -208,7 +234,8 @@
             x: xAxis,
             y: yAxis
           },
-          gridlines: yGridlines
+          gridlines: yGridlines,
+          initialize: false
         }
       );
     });
@@ -221,7 +248,8 @@
           x: xAxis,
           y: yAxis
         },
-        gridlines: yGridlines
+        gridlines: yGridlines,
+        initialize: true
       }
     );
   </script>

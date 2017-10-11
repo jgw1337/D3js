@@ -123,6 +123,10 @@
       } else if (params.initialize === false) {
         // Update info
         this.select("g.x.axis")
+            .transition()
+            .duration(500)
+            .ease(d3.easeBounce)
+            .delay(500)
             .call(params.axis.x);
         this.selectAll(".x-axis-label")
             .style("text-anchor", "end")
@@ -130,6 +134,10 @@
             .attr("dy", 8)
             .attr("transform", "translate(0,0) rotate(-45)");
         this.select("g.y.axis")
+            .transition()
+            .duration(500)
+            .ease(d3.easeBounce)
+            .delay(500)
             .call(params.axis.y);
       }
 
@@ -162,6 +170,10 @@
 
       //update phase
       this.selectAll(".bar")
+          .transition()
+          .duration(500)
+          .ease(d3.easeBounce)
+          .delay(500)
           .attr("x", function(datum, idx) {
             return x(datum.key);
           })
@@ -181,6 +193,10 @@
           });
 
       this.selectAll(".col-label")
+          .transition()
+          .duration(500)
+          .ease(d3.easeBounce)
+          .delay(500)
           .attr("x", function (datum, idx) {
             return x(datum.key) + (x.bandwidth()/2);
           })

@@ -66,6 +66,13 @@
                       .classed("display", true)
                       .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
+    var controls = d3.select("body")
+                     .append("div")
+                     .attr("id", "controls");
+    var sortBtn = controls.append("button")
+                          .html("Sort data: ascending")
+                          .attr("state", 0)
+
     function plot(params) {
       this.append("g")
           .call(params.gridlines)
@@ -142,6 +149,29 @@
           .attr("transform", "translate(" + width/2 + ",80)")
           .text("Donut type")
     }
+
+    sortBtn.on("click", function() {
+      var self = d3.select(this);
+      var ascending = function(a,b) {
+        return a.value - b.value;
+      };
+      var descending = function(a,b) {
+        return b.value - a.value;
+      };
+      var state = +self.attr("state");
+      var txt = "Sort data: ";
+      if (state === 0) {
+        data.sort(ascending);
+        state = 1;
+        txt += "descending";
+      } else if (state === 1) {
+        data.sort(descending);
+        state = 0;
+        txt += "ascending";
+      }
+      self.attr("state", state);
+      self.html(txt);
+    });
 
     plot.call(
       barChart,

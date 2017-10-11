@@ -34,15 +34,15 @@
     var width = w - margin.left - margin.right;
     var height = h - margin.top - margin.bottom;
     var x = d3.scaleBand()
-    .domain(data.map(function(item) {
-      return item.key;
-    }))
-    .range([0, width]);
+              .domain(data.map(function(item) {
+                return item.key;
+              }))
+              .range([0, width]);
     var y = d3.scaleLinear()
-      .domain([0, d3.max(data, function(datum) {
-        return datum.value;
-      })])
-      .range([height, 0]);
+              .domain([0, d3.max(data, function(datum) {
+                return datum.value;
+              })])
+              .range([height, 0]);
 
     var linearColorScale = d3.scaleLinear()
                              .domain([1, data.length])
@@ -59,9 +59,9 @@
                        .tickFormat("");
 
     var svg = d3.select("body").append("svg")
-      .attr("id", "chart")
-      .attr("width", w)
-      .attr("height", h);
+                .attr("id", "chart")
+                .attr("width", w)
+                .attr("height", h);
     var barChart = svg.append("g")
                       .classed("display", true)
                       .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
@@ -74,47 +74,75 @@
                           .attr("state", 0)
 
     function plot(params) {
+      x.domain(data.map(function(item) {
+                return item.key;
+              }));
+      y.domain([0, d3.max(data, function(datum) {
+                return datum.value;
+              })]);
+
       this.append("g")
           .call(params.gridlines)
           .classed("gridline", true)
           .attr("transform", "translate(0,0)");
+      
+
+      //enter() phase
       this.selectAll(".bar")
-        .data(params.data)
-        .enter()
-        .append("rect")
-        .classed("bar", true)
-        .attr("x", function(datum, idx) {
-          return x(datum.key);
-        })
-        .attr("y", function (datum, idx) {
-          return y(datum.value);
-        })
-        .attr("width", function (datum, idx) {
-          console.log(datum.value, x(datum.value));
-          return x.bandwidth();
-        })
-        .attr("height", function(datum, idx) {
-          return height - y(datum.value);
-        })
-        .style("fill", function(datum, idx) {
-          return ordinalColorScale(idx);
-          // return linearColorScale(idx);
-        });
+          .data(params.data)
+          .enter()
+            .append("rect")
+            .classed("bar", true);
+
       this.selectAll(".col-label")
-        .data(params.data)
-        .enter()
-        .append("text")
-        .classed("col-label", true)
-        .attr("x", function (datum, idx) {
-          return x(datum.key) + (x.bandwidth()/2);
-        })
-        .attr("y", function (datum, idx) {
-          return y(datum.value);
-        })
-        .attr("dy", -6)
-        .text(function (datum, idx) {
-          return datum.value;
-        });
+          .data(params.data)
+          .enter()
+            .append("text")
+            .classed("col-label", true);
+
+
+      //update phase
+      this.selectAll(".bar")
+          .attr("x", function(datum, idx) {
+            return x(datum.key);
+          })
+          .attr("y", function (datum, idx) {
+            return y(datum.value);
+          })
+          .attr("width", function (datum, idx) {
+            console.log(datum.value, x(datum.value));
+            return x.bandwidth();
+          })
+          .attr("height", function(datum, idx) {
+            return height - y(datum.value);
+          })
+          .style("fill", function(datum, idx) {
+            return ordinalColorScale(idx);
+            // return linearColorScale(idx);
+          });
+
+      this.selectAll(".col-label")
+          .attr("x", function (datum, idx) {
+            return x(datum.key) + (x.bandwidth()/2);
+          })
+          .attr("y", function (datum, idx) {
+            return y(datum.value);
+          })
+          .attr("dy", -6)
+          .text(function (datum, idx) {
+            return datum.value;
+          });
+
+      //exit() phase
+      this.selectAll(".bar")
+          .data(params.data)
+          .exit()
+          .remove();
+
+      this.selectAll(".col-label")
+          .data(params.data)
+          .exit()
+          .remove();
 
       this.append("g")
           .classed("x axis", true)
@@ -171,6 +199,18 @@
       }
       self.attr("state", state);
       self.html(txt);
+
+      plot.call(
+        barChart,
+        {
+          data: data,
+          axis: {
+            x: xAxis,
+            y: yAxis
+          },
+          gridlines: yGridlines
+        }
+      );
     });
 
     plot.call(

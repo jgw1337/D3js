@@ -159,7 +159,16 @@
           .data(params.data)
           .enter()
             .append("rect")
-            .classed("bar", true);
+            .classed("bar", true)
+            .on("mouseover", function(datum, idx) {
+              d3.select(this).style("fill", "yellow");
+            })
+            .on("mousemove", function(datum, idx) {
+              
+            })
+            .on("mouseout", function(datum, idx) {
+              d3.select(this).style("fill", ordinalColorScale(idx));
+            });
 
       this.selectAll(".col-label")
           .data(params.data)

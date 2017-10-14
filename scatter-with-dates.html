@@ -58,9 +58,50 @@
                 .attr("id", "chart")
                 .attr("width", w)
                 .attr("height", h);
-    var chart = avg.append("g")
-                   .classed("display", true)
-                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    var timeChart = svg.append("g")
+                       .classed("display", true)
+                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var dateParser = d3.timeParse("%Y/%m/%d");
+
+    var x = d3.scaleTime()
+              .domain(d3.extent(data, function(datum) {
+                return dateParser(datum.date);
+              }))
+              .range([0,width]);
+    var y = d3.scaleLinear()
+              .domain([0, d3.max(data, function(datum) {
+                return datum.value;
+              })])
+              .range([height,0]);
+    
+    function plot(params) {
+      // enter() phase
+      this.selectAll(".point")
+          .data(params.data)
+          .enter()
+            .append("circle")
+            .classed("point", true)
+            .attr("r", 2);
+
+      // update
+      this.selectAll(".point")
+          .attr("cx", function(datum) {
+            return x(dateParser(datum.date));
+          })
+          .attr("cy", function(datum) {
+            return y(datum.value);
+          });
+
+      // exit() phase
+      this.selectAll(".point")
+          .data(params.data)
+          .exit()
+          .remove();
+    }
+
+    plot.call(timeChart, {
+      data: data
+    });
   </script>
 </body>
 

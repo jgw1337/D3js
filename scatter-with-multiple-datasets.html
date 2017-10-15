@@ -28,6 +28,9 @@
     var scatterChart = svg.append("g")
                           .classed("display", true)
                           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
     var x = d3.scaleLinear()
               .domain(d3.extent(data, function (datum) {
                 return datum.age;
@@ -95,7 +98,8 @@
                        return datum !== "age" && datum !== "responses";
                      });
                          
-      self.selectAll(".donut")
+        // enter() for <g>
+        self.selectAll(".donut")
           .data(donuts)
           .enter()
               .append("g")
@@ -104,7 +108,13 @@
               })
               .classed("donut", true);
 
-      donuts.forEach(function(donut) {
+        // update for <g>
+        self.selectAll(".donut")
+            .style("fill", function(datum, idx) {
+              return colorScale(idx);
+            });
+
+        donuts.forEach(function(donut) {
         var g = self.selectAll("g."+donut);
         var arr = params.data.map(function(datum) {
           return {
@@ -115,14 +125,12 @@
           };
         });
 
-        // enter()
         g.selectAll(".response")
         .data(arr)
         .enter()
             .append("circle")
             .classed("response", true);
 
-        // update
         g.selectAll(".response")
         .attr("r", function(datum) {
           return responseScale(datum.responses);

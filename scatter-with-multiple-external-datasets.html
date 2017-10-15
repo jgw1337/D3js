@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Learning D3</title>
+  <link rel="stylesheet" href="main.css">
+  <script src="d3.min.js"></script>
+</head>
+
+<body>
+  <script src="scatter-with-multiple-datasets-data.js"></script>
+  <script>
+    var w = 800;
+    var h = 450;
+    var margin = {
+      top: 50,
+      left: 100,
+      right: 80,
+      bottom: 40
+    };
+    var width = w - margin.left - margin.right;
+    var height = h - margin.top - margin.bottom;
+
+    var svg = d3.select("body").append("svg")
+                .attr("id", "chart")
+                .attr("width", w)
+                .attr("height", h);
+    var scatterChart = svg.append("g")
+                          .classed("display", true)
+                          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+    var x = d3.scaleLinear()
+              .domain(d3.extent(data, function (datum) {
+                return datum.age;
+              }))
+              .range([0, width]);
+    var y = d3.scaleLinear()
+              .domain([1, 5])
+              .range([height, 0]);
+
+    var tickValues = [18, 25, 32, 39, 46, 53, 60, 67, 74];
+    var xAxis = d3.axisBottom()
+                  .scale(x)
+                  .tickValues(tickValues);
+    var xGridlines = d3.axisBottom()
+                       .scale(x)
+                       .tickValues(tickValues)
+                       .tickSize(-height, height)
+                       .tickFormat("");
+    var yAxis = d3.axisLeft()
+                  .scale(y)
+                  .tickArguments([5])
+                  .tickSize(20)
+                  .tickFormat(function (datum) {
+                    return datum.toFixed(1);
+                  });
+    var yGridlines = d3.axisLeft()
+                       .scale(y)
+                       .tickSize(-width, 0, 0)
+                       .tickFormat("");
+
+    var responseScale = d3.scaleLinear()
+                          .domain(d3.extent(data, function (datum) {
+                            return datum.responses;
+                          }))
+                          .range([2, 15]);
+
+    function drawAxis(params) {
+      if (params.initialize) {
+        this.append("g")
+            .classed("x gridline", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(params.axis.gridlines.x);
+        this.append("g")
+            .classed("y gridline", true)
+            .attr("transform", "translate(0,0)")
+            .call(params.axis.gridlines.y);
+        this.append("g")
+            .classed("y axis", true)
+            .attr("transform", "translate(0,0)")
+            .call(params.axis.y);
+        this.append("g")
+            .classed("x axis", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(params.axis.x);
+        this.select(".y.axis")
+            .append("text")
+            .classed("y axis-label", true)
+            .attr("transform", "translate(-56," + height / 2 + ") rotate(-90)")
+            .text("Rating (1=Low, 5=High)");
+        this.select(".x.axis")
+            .append("text")
+            .classed("x axis-label", true)
+            .attr("transform", "translate(" + width / 2 + ",35)")
+            .text("Customer age");
+        this.append("g")
+            .append("text")
+            .classed("chart-header", true)
+            .attr("transform", "translate(0,-24)")
+            .text("");
+      }
+    }
+
+    function plot(params) {
+      var self = this;
+      drawAxis.call(self, params);
+      var donuts = d3.keys(params.data[0])
+                     .filter(function (datum) {
+                       return datum !== "age" && datum !== "responses";
+                     });
+
+      // enter() for <g>
+      self.selectAll(".donut")
+          .data(donuts)
+          .enter()
+            .append("g")
+            .attr("class", function (datum) {
+              return datum;
+            })
+            .classed("donut", true);
+
+      // update for <g>
+      self.selectAll(".donut")
+          .style("fill", function (datum, idx) {
+            return colorScale(idx);
+          })
+          .on("mouseover", function (datum, idx) {
+            d3.select(this)
+              .transition()
+              .style("opacity", 1);
+          })
+          .on("mouseout", function (datum, idx) {
+            d3.select(this)
+              .transition()
+              .style("opacity", 0.2);
+          });
+
+      donuts.forEach(function (donut) {
+        var g = self.selectAll("g." + donut);
+        var arr = params.data.map(function (datum) {
+          return {
+            key: donut,
+            value: datum[donut],
+            age: datum.age,
+            responses: datum.responses
+          };
+        });
+
+        // enter()
+        g.selectAll(".response")
+          .data(arr)
+          .enter()
+            .append("circle")
+            .classed("response", true);
+
+        // update
+        g.selectAll(".response")
+          .attr("r", function (datum) {
+            return responseScale(datum.responses);
+          })
+          .attr("cx", function (datum) {
+            return x(datum.age);
+          })
+          .attr("cy", function (datum) {
+            return y(datum.value);
+          })
+          .on("mouseover", function(datum, idx) {
+            var str = datum.key + " donut";
+            str += ": age: " + datum.age;
+            str += "; responses: " + datum.responses;
+            str += "; average rating: " + datum.value;
+            d3.select(".chart-header")
+              .text(str);
+          })
+          .on("mouseout", function(datum, idx) {
+            d3.select(".chart-header")
+            .text("");
+        });
+
+        // exit()
+        g.selectAll(".response")
+          .data(arr)
+          .exit()
+          .remove();
+      });
+    }
+
+    plot.call(scatterChart, {
+      data: data,
+      axis: {
+        x: xAxis,
+        y: yAxis,
+        gridlines: {
+          x: xGridlines,
+          y: yGridlines
+        }
+      },
+      initialize: true
+    })
+  </script>
+</body>
+
+</html>

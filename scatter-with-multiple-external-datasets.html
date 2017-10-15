@@ -32,9 +32,6 @@
     var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
     var x = d3.scaleLinear()
-              .domain(d3.extent(data, function (datum) {
-                return datum.age;
-              }))
               .range([0, width]);
     var y = d3.scaleLinear()
               .domain([1, 5])
@@ -62,9 +59,6 @@
                        .tickFormat("");
 
     var responseScale = d3.scaleLinear()
-                          .domain(d3.extent(data, function (datum) {
-                            return datum.responses;
-                          }))
                           .range([2, 15]);
 
     function drawAxis(params) {
@@ -104,6 +98,13 @@
     }
 
     function plot(params) {
+      x.domain(d3.extent(params.data, function (datum) {
+        return datum.age;
+      }));
+      responseScale.domain(d3.extent(params.data, function (datum) {
+        return datum.responses;
+      }));
+
       var self = this;
       drawAxis.call(self, params);
       var donuts = d3.keys(params.data[0])
@@ -187,18 +188,22 @@
       });
     }
 
-    plot.call(scatterChart, {
-      data: data,
-      axis: {
-        x: xAxis,
-        y: yAxis,
-        gridlines: {
-          x: xGridlines,
-          y: yGridlines
-        }
-      },
-      initialize: true
-    })
+    // Note: "d3.csv" requires this file to be hosted on a web server
+    d3.csv("scatter-with-multiple-external-datasets.csv", function(error, parsed_data) {
+      plot.call(scatterChart, {
+        data: parsed_data,
+        axis: {
+          x: xAxis,
+          y: yAxis,
+          gridlines: {
+            x: xGridlines,
+            y: yGridlines
+          }
+        },
+        initialize: true
+      })
+    });
+
   </script>
 </body>
 

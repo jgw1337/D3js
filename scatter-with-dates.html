@@ -82,6 +82,14 @@
                   .scale(y)
                   .tickArguments([5]);
 
+    var line = d3.line()
+                 .x(function(datum) {
+                    return x(dateParser(datum.date));
+                 })
+                 .y(function(datum) {
+                    return y(datum.value);
+                 });
+
     function plot(params) {
       this.append("g")
           .classed("x axis", true)
@@ -93,6 +101,17 @@
           .call(params.axis.y);
 
       // enter() phase
+      // note: a "line" is one "path" element w/ lots of data elements within...
+      //            <path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />
+      //       ... where (The M indicates a moveto, the Ls indicate linetos, and the z indicates a closepath)
+      //       ...so pass the data as an array
+      this.selectAll(".trendline")
+          .data([params.data])
+          .enter()
+            .append("path")
+            .classed("trendline", true);
+      // note: a "point" is a "circle" that are discrete elements
+      //       ...so pass the data normally
       this.selectAll(".point")
           .data(params.data)
           .enter()
@@ -101,6 +120,10 @@
             .attr("r", 2);
 
       // update
+      this.selectAll(".trendline")
+          .attr("d", function(datum) {
+            return line(datum);
+          })
       this.selectAll(".point")
           .attr("cx", function(datum) {
             return x(dateParser(datum.date));
@@ -110,6 +133,10 @@
           });
 
       // exit() phase
+      this.selectAll(".trendline")
+          .data([params.data])
+          .exit()
+          .remove();
       this.selectAll(".point")
           .data(params.data)
           .exit()

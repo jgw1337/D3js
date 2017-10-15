@@ -36,14 +36,60 @@
     var y = d3.scaleLinear()
               .domain([1, 5])
               .range([height, 0]);
+
+    var tickValues = [18, 25, 32, 39, 46, 53, 60, 67, 74];
+    var xAxis = d3.axisBottom()
+                  .scale(x)
+                  .tickValues(tickValues);
+    var xGridlines = d3.axisBottom()
+                       .scale(x)
+                       .tickValues(tickValues)
+                       .tickSize(-height, height)
+                       .tickFormat("");
+    var yAxis = d3.axisLeft()
+                  .scale(y)
+                  .tickArguments([5])
+                  .tickSize(20)
+                  .tickFormat(function(datum) {
+                    return datum.toFixed(1);
+                  });
+    var yGridlines = d3.axisLeft()
+                       .scale(y)
+                       .tickSize(-width, 0, 0)
+                       .tickFormat("");
+
+
     var responseScale = d3.scaleLinear()
                           .domain(d3.extent(data, function(datum) {
                             return datum.responses;
                           }))
                           .range([2,15]);
 
+
+    function drawAxis(params) {
+      if (params.initialize) {
+        this.append("g")
+            .classed("x gridline", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(params.axis.gridlines.x);
+        this.append("g")
+            .classed("y gridline", true)
+            .attr("transform", "translate(0,0)")
+            .call(params.axis.gridlines.y);
+        this.append("g")
+            .classed("y axis", true)
+            .attr("transform", "translate(0,0)")
+            .call(params.axis.y);
+        this.append("g")
+            .classed("x axis", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(params.axis.x);
+      }
+    }
+
     function plot(params) {
       var self = this;
+      drawAxis.call(self, params);
       var donuts = d3.keys(params.data[0])
                      .filter(function(datum){
                        return datum !== "age" && datum !== "responses";
@@ -97,7 +143,16 @@
     }
 
     plot.call(scatterChart, {
-      data: data
+      data: data,
+      axis: {
+        x: xAxis,
+        y: yAxis,
+        gridlines: {
+          x: xGridlines,
+          y: yGridlines
+        }
+      },
+      initialize: true
     })
   </script>
 </body>

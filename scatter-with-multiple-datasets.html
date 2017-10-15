@@ -112,6 +112,16 @@
         self.selectAll(".donut")
             .style("fill", function(datum, idx) {
               return colorScale(idx);
+            })
+            .on("mouseover", function(datum, idx) {
+              d3.select(this)
+                .transition()
+                .style("opacity", 1);
+            })
+            .on("mouseout", function(datum, idx) {
+              d3.select(this)
+                .transition()
+                .style("opacity", 0.2);
             });
 
         donuts.forEach(function(donut) {
@@ -125,12 +135,14 @@
           };
         });
 
+        // enter()
         g.selectAll(".response")
         .data(arr)
         .enter()
             .append("circle")
             .classed("response", true);
 
+        // update
         g.selectAll(".response")
         .attr("r", function(datum) {
           return responseScale(datum.responses);

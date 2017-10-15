@@ -89,6 +89,14 @@
                  .y(function(datum) {
                     return y(datum.value);
                  });
+    var area = d3.area()
+                 .x(function(datum) {
+                   return x(dateParser(datum.date));
+                 })
+                 .y0(height)
+                 .y1(function(datum) {
+                   return y(datum.value);
+                 });
 
     function plot(params) {
       this.append("g")
@@ -110,6 +118,13 @@
           .enter()
             .append("path")
             .classed("trendline", true);
+      // note: an "area" is one "path" element w/ lots of data elements within...
+      //       ...so pass the data as an array
+      this.selectAll(".area")
+          .data([params.data])
+          .enter()
+            .append("path")
+            .classed("area", true);
       // note: a "point" is a "circle" that are discrete elements
       //       ...so pass the data normally
       this.selectAll(".point")
@@ -124,6 +139,10 @@
           .attr("d", function(datum) {
             return line(datum);
           })
+      this.selectAll(".area")
+          .attr("d", function(datum) {
+            return area(datum);
+          })
       this.selectAll(".point")
           .attr("cx", function(datum) {
             return x(dateParser(datum.date));
@@ -134,6 +153,10 @@
 
       // exit() phase
       this.selectAll(".trendline")
+          .data([params.data])
+          .exit()
+          .remove();
+      this.selectAll(".area")
           .data([params.data])
           .exit()
           .remove();

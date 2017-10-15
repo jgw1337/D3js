@@ -34,3 +34,9 @@ body, html {
 	stroke: #CCC;
 	stroke-width: 4px;
 }
+.area {
+	opacity: 0.5;
+	fill: #CCC;
+	stroke: #CCC;
+	stroke-width: #CCC;
+}

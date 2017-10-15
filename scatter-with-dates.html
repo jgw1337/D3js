@@ -73,8 +73,25 @@
                 return datum.value;
               })])
               .range([height,0]);
-    
+
+    var xAxis = d3.axisBottom()
+                  .scale(x)
+                  .tickArguments([d3.timeWeek])
+                  .tickFormat(d3.timeFormat("%m/%d"));
+    var yAxis = d3.axisLeft()
+                  .scale(y)
+                  .tickArguments([5]);
+
     function plot(params) {
+      this.append("g")
+          .classed("x axis", true)
+          .attr("transform", "translate(0," + height + ")")
+          .call(params.axis.x);
+      this.append("g")
+          .classed("y axis", true)
+          .attr("transform", "translate(0,0)")
+          .call(params.axis.y);
+
       // enter() phase
       this.selectAll(".point")
           .data(params.data)
@@ -100,7 +117,11 @@
     }
 
     plot.call(timeChart, {
-      data: data
+      data: data,
+      axis: {
+        x: xAxis,
+        y: yAxis
+      }
     });
   </script>
 </body>

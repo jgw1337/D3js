@@ -33,6 +33,7 @@ body, html {
 	fill: none;
 	stroke: #CCC;
 	stroke-width: 4px;
+	stroke-dasharray: 10;
 }
 .area {
 	opacity: 0.5;

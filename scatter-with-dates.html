@@ -88,7 +88,8 @@
                  })
                  .y(function(datum) {
                     return y(datum.value);
-                 });
+                 })
+                 .curve(d3.curveCardinal);
     var area = d3.area()
                  .x(function(datum) {
                    return x(dateParser(datum.date));
@@ -96,8 +97,9 @@
                  .y0(height)
                  .y1(function(datum) {
                    return y(datum.value);
-                 });
-
+                 })
+                 .curve(d3.curveCardinal);
+                 
     function plot(params) {
       this.append("g")
           .classed("x axis", true)
